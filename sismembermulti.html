@@ -1,0 +1,46 @@
+---
+title: sismembermulti
+brief: Check for membership in any number of sets.
+updated: 2014-07-30 18:44
+layout: script
+sha: 140053a7dc99e7d4f095f8723befa934dbc3430a
+return: 1 if the key is found, 0 if not
+---
+
+<strong>Keys: any number</strong>
+<ul class="args">
+  <li>1..n: Sets to check for membership.</li>
+</ul>
+
+<strong>Args: 1</strong><br>
+<ol class="args">
+  <li>a value to check for</li>
+</ol>
+
+<h2>Example</h2>
+
+<pre class="script-example">
+> sadd users alice bob
+(integer) 2
+> sadd admin jenny
+(integer) 1
+> evalsha 140053a7dc99e7d4f095f8723befa934dbc3430a 2 users admin alice
+(integer) 1
+> evalsha 140053a7dc99e7d4f095f8723befa934dbc3430a 3 users admin guests jenny
+(integer) 1
+> evalsha 140053a7dc99e7d4f095f8723befa934dbc3430a 2 users admin abner
+(integer) 0
+</pre>
+
+<h2>Source</h2>
+
+<pre class="script-source">
+-- Is an item in any of several sets? Call with:
+-- EVALSHA <hash> n set1 set2 ... setn key
+for i=1,#KEYS do
+   if redis.call('sismember', KEYS[i], ARGV[1]) == 1 then
+      return 1
+   end
+end
+return 0
+</pre>

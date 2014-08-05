@@ -1,0 +1,43 @@
+---
+title: hincrbyex
+brief: Increment a value in a hash only if it exists
+updated: 2014-07-31 10:28:00
+layout: script
+sha: 3cb0d65c399fda8a1d4eb93b2fe85311671bc969
+return: The new value of the counter if found, otherwise nil
+---
+
+<strong>Keys: 1</strong>
+<ol class="args">
+  <li>A hash containing a field to be used as a counter.</li>
+</ol>
+
+<strong>Args: 2</strong>
+<ol class="args">
+  <li>The field within the hash to use as a counter.</li>
+  <li>The amount to increment the counter by.</li>
+</ol>
+
+<h2>Example</h2>
+
+<pre class="script-example">
+> evalsha 3cb0d65c399fda8a1d4eb93b2fe85311671bc969 1 guests sally 1
+(nil)
+> hset guests sally 8
+(integer) 1
+> evalsha 3cb0d65c399fda8a1d4eb93b2fe85311671bc969 1 guests sally 1
+(integer) 9
+> evalsha 3cb0d65c399fda8a1d4eb93b2fe85311671bc969 1 guests sally 1
+(integer) 10
+</pre>
+
+<h2>Source</h2>
+
+<pre class="script-source">
+if redis.call("HEXISTS", KEYS[1], ARGV[1]) == 1 then
+  return redis.call("HINCRBY", KEYS[1], ARGV[1], ARGV[2])
+else
+  return nil
+end
+</pre>
+

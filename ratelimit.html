@@ -1,0 +1,55 @@
+---
+title: ratelimit
+brief: Simple rate limiter
+updated: 2014-07-30 18:50:00
+layout: script
+sha: 4aec832155729e2c245b2d7b8ca99cac592c2601
+return: 1 if rate limit exceeded, otherwise 0
+---
+
+<strong>Keys: 1</strong>
+<ol class="args">
+  <li>A key to use as an expiring counter, e.g. "ratelimit:ip:127.0.0.1"</li>
+</ol>
+
+<strong>Args: 2</strong><br>
+<ol class="args">
+  <li>Maximum number of calls</li>
+  <li>Amount of time in ms</li>
+</ol>
+
+<h2>Example</h2>
+
+<p>This example sets a rate limit of 5 calls per 10 seconds. Repeatedly running
+the script 6 times in under ten seconds, we see the rate-limiter's effect.</p>
+
+<pre class="script-example">
+> evalsha 4aec832155729e2c245b2d7b8ca99cac592c2601 1 ratelimit:192.168.1.1 5 10000
+(integer) 0
+> evalsha 4aec832155729e2c245b2d7b8ca99cac592c2601 1 ratelimit:192.168.1.1 5 10000
+(integer) 0
+> evalsha 4aec832155729e2c245b2d7b8ca99cac592c2601 1 ratelimit:192.168.1.1 5 10000
+(integer) 0
+> evalsha 4aec832155729e2c245b2d7b8ca99cac592c2601 1 ratelimit:192.168.1.1 5 10000
+(integer) 0
+> evalsha 4aec832155729e2c245b2d7b8ca99cac592c2601 1 ratelimit:192.168.1.1 5 10000
+(integer) 0
+> evalsha 4aec832155729e2c245b2d7b8ca99cac592c2601 1 ratelimit:192.168.1.1 5 10000
+(integer) 1
+</pre>
+
+<h2>Source</h2>
+
+<pre class="script-source">
+local cnt = redis.call('INCR', KEYS[1])
+if cnt > tonumber(ARGV[1])
+then
+	return 1
+end
+if cnt == 1
+then
+	redis.call('PEXPIRE', KEYS[1], ARGV[2])
+end
+return 0
+</pre>
+

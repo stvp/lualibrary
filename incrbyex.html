@@ -1,0 +1,42 @@
+---
+title: incrbyex
+brief: Increment a value only if it exists
+updated: 2014-07-31 10:28:00
+layout: script
+sha: f74dd5c086898b8a3d69655334b94fa7e006a9b1
+return: The new value of the counter if found, otherwise nil
+---
+
+<strong>Keys: 1</strong>
+<ol class="args">
+  <li>A key used as a counter, which may or may not exist</li>
+</ol>
+
+<strong>Args: 1</strong>
+<ol class="args">
+  <li>The amount to increment the value by</li>
+</ol>
+
+<h2>Example</h2>
+
+<pre class="script-example">
+> evalsha f74dd5c086898b8a3d69655334b94fa7e006a9b1 1 activeusers 1
+(nil)
+> set activeusers 0
+OK
+> evalsha f74dd5c086898b8a3d69655334b94fa7e006a9b1 1 activeusers 1
+(integer) 1
+> evalsha f74dd5c086898b8a3d69655334b94fa7e006a9b1 1 activeusers 2
+(integer) 3
+</pre>
+
+<h2>Source</h2>
+
+<pre class="script-source">
+if redis.call("EXISTS",KEYS[1]) == 1 then
+  return redis.call("INCRBY",KEYS[1],ARGV[1])
+else
+  return nil
+end
+</pre>
+
