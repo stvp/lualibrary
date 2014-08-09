@@ -1,0 +1,47 @@
+---
+title: zpop
+brief: Removes and returns the top value in a zset, with its score.
+updated: 2014-08-08 17:03
+layout: script
+sha: 196f7a1d80536678fc68084939fe2dc91ac29e67
+return: Array reply - element and its score
+---
+
+<strong>Keys: 1</strong>
+<ol class="args">
+  <li>a Sorted Set</li>
+</ol>
+
+<strong>Args: None</strong><br>
+
+<h2>Example</h2>
+
+<pre class="script-example">
+> zincrby scoreboard 1 bpo
+"1"
+> zincrby scoreboard 1 bpo
+"2"
+> zincrby scoreboard 1 tyson
+"1"
+> zincrby scoreboard 1 tyson
+"2"
+> zincrby scoreboard 1 tyson
+"3"
+> evalsha 196f7a1d80536678fc68084939fe2dc91ac29e67 1 scoreboard
+1) "tyson"
+2) "3"
+> evalsha 196f7a1d80536678fc68084939fe2dc91ac29e67 1 scoreboard
+1) "bpo"
+2) "2"
+> evalsha 196f7a1d80536678fc68084939fe2dc91ac29e67 1 scoreboard
+(empty list or set)
+</pre>
+
+<h2>Source</h2>
+
+<pre class="script-source">
+local result = redis.call('zrange', KEYS[1], -1, -1, "WITHSCORES")
+if result then redis.call('zremrangebyrank', KEYS[1], -1, -1) end
+return result
+</pre>
+
