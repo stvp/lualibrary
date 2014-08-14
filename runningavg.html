@@ -1,0 +1,58 @@
+---
+title: runningavg
+brief: Keep a running calculation of the average value of a series
+updated: 2014-08-14 13:12
+layout: script
+
+return: the new average value
+---
+
+<strong>Keys: 2</strong>
+<ul class="args">
+  <li>1: Key to store the current average.</li>
+  <li>2: Key to store the current count of values.</li>
+</ul>
+
+<strong>Args: 1</strong>
+<ul class="args">
+  <li>the next value in the series</li>
+</ul>
+
+<h2>Description</h2>
+
+This script can be used to keep a running average of a series of values, without
+needing to keep each of the individual values around.
+
+<h2>Example</h2>
+
+<pre class="script-example">
+> evalsha 399fddde578fd9cb924edce746c783e8340d8251 2 score:avg score:count 80
+"80"
+> evalsha 399fddde578fd9cb924edce746c783e8340d8251 2 score:avg score:count 100
+"90"
+> evalsha 399fddde578fd9cb924edce746c783e8340d8251 2 score:avg score:count 75
+"85"
+> evalsha 399fddde578fd9cb924edce746c783e8340d8251 2 score:avg score:count 98
+"88.25"
+> evalsha 399fddde578fd9cb924edce746c783e8340d8251 2 score:avg score:count 98
+"90.2"
+> evalsha 399fddde578fd9cb924edce746c783e8340d8251 2 score:avg score:count 98
+"91.5"
+> get score:avg
+"91.5"
+> get score:count
+"6"
+</pre>
+
+
+<h2>Source</h2>
+
+<pre class="script-source">
+local currentval = tonumber(redis.call('get', KEYS[1])) or 0
+local count = redis.call('incr', KEYS[2])
+
+currentval = tostring(currentval * (count - 1)/count + (ARGV[1]/count))
+
+redis.call('set', KEYS[1], currentval)
+return currentval
+</pre>
